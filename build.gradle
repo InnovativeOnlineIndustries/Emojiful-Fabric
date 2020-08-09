@@ -1,64 +1,20 @@
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url "https://plugins.gradle.org/m2/" }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath "com.wynprice.cursemaven:CurseMaven:2.1.1"
-        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
-    }
+plugins {
+    id "fabric-loom" version "0.4-SNAPSHOT"
+    id "java"
+    id "idea"
+    //id "com.wynprice.cursemaven" version "2.1.1"
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: "java"
-apply plugin: "idea"
-apply plugin: "com.wynprice.cursemaven"
-apply plugin: "com.github.johnrengelman.shadow"
 
-version = "${minecraft_version}-" + "${version}"
+//version = "${minecraft_version}-" + "${version}"
+version = "${version}+fabric-${minecraft_version}"
 group = "${group}"
 archivesBaseName = "${archive}"
-
-
-
-repositories {
-    maven {
-        name = "forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-
-    maven {
-        url "https://maven.tterrag.com/"
-    }
-}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
-    mappings channel: "snapshot", version: "${mappings_version}"
-    runs {
-        client {
-            workingDirectory project.file('run')
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessWidener "src/main/resources/emojiful.accesswidener"
 }
 
 repositories {
@@ -67,32 +23,41 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compile group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.13'
+    minecraft("com.mojang:minecraft:${minecraft_version}")
+    mappings("net.fabricmc:yarn:${minecraft_version}+build.${mappings_build}:v2")
+    modImplementation("net.fabricmc:fabric-loader:${loader_version}")
+
+    include modApi("com.esotericsoftware.yamlbeans:yamlbeans:1.13")
+
+//    modImplementation(fabricApi.module("fabric-textures-v0", "0.17.0+build.386-1.16.1"))
+//    modImplementation(fabricApi.module("fabric-api-base", "0.17.0+build.386-1.16.1"))
 }
 
-reobf {
-    shadowJar {}
-}
+processResources {
+    inputs.property "version", project.version
 
-shadowJar{
-
-}
-
-shadowJar {
-    dependencies {
-        include(dependency(group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.13'))
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
     }
-    classifier ''
-}
 
-jar {
-    manifest {
-        attributes "FMLAT": "emojiful_at.cfg"
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
     }
 }
-artifacts {
-    archives shadowJar
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier = "sources"
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
 }
 
 jar {
@@ -102,7 +67,7 @@ jar {
                 "Specification-Vendor"    : "${team}",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}",
+                "Implementation-Version"  : "${project.version}",
                 "Implementation-Vendor"   : "${team}",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 "ModSide": "BOTH",
