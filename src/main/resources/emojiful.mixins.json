@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.hrznstudio.emojiful.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.1.0",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "ChatScreenMixin",
+    "MinecraftClientMixin"
+  ]
+}

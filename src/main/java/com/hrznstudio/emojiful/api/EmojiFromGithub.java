@@ -2,26 +2,26 @@ package com.hrznstudio.emojiful.api;
 
 import com.hrznstudio.emojiful.Emojiful;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.ResourceTexture;
+import net.minecraft.client.texture.TextureUtil;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
 import org.apache.commons.io.FileUtils;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.IntBuffer;
 
 public class EmojiFromGithub extends Emoji {
 
-    public SimpleTexture img;
-    public ResourceLocation resourceLocation = loading_texture;
+    public ResourceTexture img;
+    public Identifier resourceLocation = loading_texture;
     public String url;
 
     @Override
@@ -30,14 +30,14 @@ public class EmojiFromGithub extends Emoji {
             return;
 
         img = new DownloadImageData(new File("emojiful/cache/" + name + "-" + version), url, loading_texture);
-        resourceLocation = new ResourceLocation(Emojiful.MODID, "texures/emoji/" + location.toLowerCase().replaceAll("[^a-z0-9/._-]", "") + "_" + version);
-        Minecraft.getInstance().getTextureManager().loadTexture(resourceLocation, img);
+        resourceLocation = new Identifier(Emojiful.MODID, "texures/emoji/" + location.toLowerCase().replaceAll("[^a-z0-9/._-]", "") + "_" + version);
+        MinecraftClient.getInstance().getTextureManager().registerTexture(resourceLocation, img);
     }
 
-    public ResourceLocation getResourceLocationForBinding() {
+    public Identifier getResourceLocationForBinding() {
         checkLoad();
         if (deleteOldTexture) {
-            img.deleteGlTexture();
+            img.clearGlId();
             deleteOldTexture = false;
         }
         return resourceLocation;
@@ -51,14 +51,14 @@ public class EmojiFromGithub extends Emoji {
         return false;
     }
 
-    public class DownloadImageData extends SimpleTexture {
+    public class DownloadImageData extends ResourceTexture {
         private final File cacheFile;
         private final String imageUrl;
         private NativeImage nativeImage;
         private Thread imageThread;
         private boolean textureUploaded;
 
-        public DownloadImageData(File cacheFileIn, String imageUrlIn, ResourceLocation textureResourceLocation) {
+        public DownloadImageData(File cacheFileIn, String imageUrlIn, Identifier textureResourceLocation) {
             super(textureResourceLocation);
             this.cacheFile = cacheFileIn;
             this.imageUrl = imageUrlIn;
@@ -67,18 +67,18 @@ public class EmojiFromGithub extends Emoji {
         private void checkTextureUploaded() {
             if (!this.textureUploaded) {
                 if (this.nativeImage != null) {
-                    if (this.textureLocation != null) {
-                        this.deleteGlTexture();
+                    if (this.location != null) {
+                        this.clearGlId();
                     }
-                    TextureUtil.prepareImage(super.getGlTextureId(), this.nativeImage.getWidth(), this.nativeImage.getHeight());
-                    this.nativeImage.uploadTextureSub(0, 0, 0, true);
+                    TextureUtil.uploadImage(IntBuffer.allocate(super.getGlId()), this.nativeImage.getWidth(), this.nativeImage.getHeight());
+                    this.nativeImage.upload(0, 0, 0, true);
                     this.textureUploaded = true;
                 }
             }
         }
 
         private void setImage(NativeImage nativeImageIn) {
-            Minecraft.getInstance().execute(() -> {
+            MinecraftClient.getInstance().execute(() -> {
                 this.textureUploaded = true;
                 if (!RenderSystem.isOnRenderThread()) {
                     RenderSystem.recordRenderCall(() -> {
@@ -92,11 +92,10 @@ public class EmojiFromGithub extends Emoji {
         }
 
         private void upload(NativeImage imageIn) {
-            TextureUtil.prepareImage(this.getGlTextureId(), imageIn.getWidth(), imageIn.getHeight());
-            imageIn.uploadTextureSub(0, 0, 0, true);
+            TextureUtil.allocate(this.getGlId(), imageIn.getWidth(), imageIn.getHeight());
+            imageIn.upload(0, 0, 0, true);
         }
 
-        @Nullable
         private NativeImage loadTexture(InputStream inputStreamIn) {
             NativeImage nativeimage = null;
 
@@ -110,7 +109,7 @@ public class EmojiFromGithub extends Emoji {
         }
 
         @Override
-        public void loadTexture(IResourceManager resourceManager) throws IOException {
+        public void load(ResourceManager resourceManager) throws IOException {
             if (this.imageThread == null) {
                 if (this.cacheFile != null && this.cacheFile.isFile()) {
                     try {
@@ -132,7 +131,7 @@ public class EmojiFromGithub extends Emoji {
                     HttpURLConnection httpurlconnection = null;
 
                     try {
-                        httpurlconnection = (HttpURLConnection) (new URL(DownloadImageData.this.imageUrl)).openConnection(Minecraft.getInstance().getProxy());
+                        httpurlconnection = (HttpURLConnection) (new URL(DownloadImageData.this.imageUrl)).openConnection(MinecraftClient.getInstance().getNetworkProxy());
                         httpurlconnection.setDoInput(true);
                         httpurlconnection.setDoOutput(false);
                         httpurlconnection.connect();

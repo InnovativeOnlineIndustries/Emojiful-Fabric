@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+
+  "id": "emojiful",
+  "version": "$version",
+  "name": "Emojiful",
+  "description": "Adds Emotes to the Game Chat!!!",
+
+  "contact": {
+    "issues": "https://github.com/InnovativeOnlineIndustries/Emojiful/issues"
+  },
+  "authors": [
+    {
+      "name": "Horizon Studio",
+      "contact": {
+        "homepage": "https://hrznstudio.com",
+        "discord": "https://discord.gg/8eVjQrb"
+      }
+    }
+  ],
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [ "com.hrznstudio.emojiful.Emojiful" ],
+    "client": [ "com.hrznstudio.emojiful.EmojifulClient" ]
+  },
+  "mixins": [ "emojiful.mixins.json" ],
+  "accessWidener": "emojiful.accesswidener",
+
+  "depends": {
+    "fabricloader": ">=0.8.0",
+    "minecraft": "1.16.1"
+  }
+}

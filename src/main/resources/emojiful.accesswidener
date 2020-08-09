@@ -1,0 +1,10 @@
+accessWidener	v1	named
+mutable field net/minecraft/client/MinecraftClient textRenderer Lnet/minecraft/client/font/TextRenderer;
+mutable field net/minecraft/client/render/entity/EntityRenderDispatcher textRenderer Lnet/minecraft/client/font/TextRenderer;
+accessible field net/minecraft/client/render/entity/EntityRenderDispatcher textRenderer Lnet/minecraft/client/font/TextRenderer;
+accessible field net/minecraft/client/font/TextRenderer fontStorageAccessor Ljava/util/function/Function;
+extendable method net/minecraft/client/font/TextRenderer drawLayer (Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F
+extendable method net/minecraft/client/font/TextRenderer drawLayer (Lnet/minecraft/text/StringRenderable;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F
+accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
+accessible method net/minecraft/client/font/TextRenderer drawGlyph (Lnet/minecraft/client/font/GlyphRenderer;ZZFFFLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;FFFFI)V
+accessible field net/minecraft/client/font/FontStorage SPACE Lnet/minecraft/client/font/Glyph;
