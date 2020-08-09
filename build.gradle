@@ -29,8 +29,8 @@ dependencies {
 
     include modApi("com.esotericsoftware.yamlbeans:yamlbeans:1.13")
 
-//    modImplementation(fabricApi.module("fabric-textures-v0", "0.17.0+build.386-1.16.1"))
-//    modImplementation(fabricApi.module("fabric-api-base", "0.17.0+build.386-1.16.1"))
+    modImplementation(fabricApi.module("fabric-textures-v0", "0.17.0+build.386-1.16.1"))
+    modImplementation(fabricApi.module("fabric-api-base", "0.17.0+build.386-1.16.1"))
 }
 
 processResources {

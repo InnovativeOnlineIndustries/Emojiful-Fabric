@@ -5,19 +5,10 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 import com.google.gson.JsonElement;
 import com.hrznstudio.emojiful.api.Emoji;
 import com.hrznstudio.emojiful.api.EmojiFromGithub;
-import com.hrznstudio.emojiful.gui.EmojiButton;
-import com.hrznstudio.emojiful.gui.ParentButton;
-import com.hrznstudio.emojiful.gui.TranslucentButton;
-import com.hrznstudio.emojiful.render.EmojiFontRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
 
@@ -72,10 +63,10 @@ public class EmojifulClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         preInitEmojis();
-//        ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).register((spriteAtlasTexture, registry) -> {
-//            registry.register(new Identifier(Emojiful.MODID, "26a0"));
-//            registry.register(new Identifier(Emojiful.MODID, "26d4"));
-//        });
+        ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).register((spriteAtlasTexture, registry) -> {
+            registry.register(new Identifier(Emojiful.MODID, "26a0"));
+            registry.register(new Identifier(Emojiful.MODID, "26d4"));
+        });
         EmojifulConfig.getInstance();
         Emojiful.LOGGER.info("Loaded {} emojis", Emojiful.EMOJI_LIST.size());
     }
